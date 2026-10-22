@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EE-Core Web Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .input-field { background-color: #0f172a; border: 1px solid #475569; color: #f8fafc; }
+        .input-field:focus { border-color: #38bdf8; outline: none; }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-2 rounded-lg font-bold"><i class="fa-solid fa-microchip"></i></div>
+                <div>
+                    <h1 class="font-bold text-xl tracking-wide text-white">EE-Core Engine</h1>
+                    <p class="text-xs text-slate-400">Villamosmérnöki Eszköztár & Core C++ Engine • <span class="text-blue-400 font-mono">Flopy</span></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="langToggle" onclick="toggleLanguage()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-xs font-semibold border border-slate-700 transition">
+                    🌐 <span id="langText">EN</span>
+                </button>
+                <a href="https://github.com/FlopyHU/ee-core" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-xs font-semibold border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 mt-8 space-y-8">
+        <!-- RLC Calculator -->
+        <section class="card rounded-xl p-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-yellow-400"></i>
+                <span id="txt-rlc-title">RLC Soros / Párhuzamos Kompleks Impedancia</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Ellenállás (R - Ω)</label>
+                    <input type="number" id="rlc-r" value="100" class="w-full input-field rounded p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Induktivitás (L - H)</label>
+                    <input type="number" id="rlc-l" value="0.01" step="0.001" class="w-full input-field rounded p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Kapacitás (C - F)</label>
+                    <input type="number" id="rlc-c" value="0.000001" step="0.000001" class="w-full input-field rounded p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Frekvencia (f - Hz)</label>
+                    <input type="number" id="rlc-f" value="1000" class="w-full input-field rounded p-2 text-sm">
+                </div>
+            </div>
+            <button onclick="calcRLC()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded text-sm transition">
+                <i class="fa-solid fa-calculator mr-1"></i> Számítás
+            </button>
+
+            <div id="rlc-out" class="mt-4 p-4 rounded bg-slate-900 border border-slate-800 text-sm font-mono text-cyan-400">
+                Z = 100.00 + j62.83 Ω | |Z| = 118.10 Ω | Phase: 32.14°
+            </div>
+        </section>
+
+        <!-- Oscilloscope Simulator -->
+        <section class="card rounded-xl p-6 shadow-xl">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-wave-square text-emerald-400"></i>
+                <span id="txt-osc-title">Jelgenerátor & Oszcilloszkóp Szimulátor</span>
+            </h2>
+            <div class="h-64 bg-slate-900 rounded p-2 border border-slate-800">
+                <canvas id="scopeCanvas"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentLang = 'hu';
+        let chartInstance = null;
+
+        function calcRLC() {
+            const R = parseFloat(document.getElementById('rlc-r').value) || 0;
+            const L = parseFloat(document.getElementById('rlc-l').value) || 0;
+            const C = parseFloat(document.getElementById('rlc-c').value) || 0;
+            const f = parseFloat(document.getElementById('rlc-f').value) || 0;
+
+            const omega = 2 * Math.PI * f;
+            const X_L = omega * L;
+            const X_C = C > 0 ? (1 / (omega * C)) : 0;
+            const X = X_L - X_C;
+
+            const mag = Math.sqrt(R*R + X*X);
+            const phaseDeg = Math.atan2(X, R) * (180 / Math.PI);
+            const sign = X >= 0 ? '+' : '-';
+
+            document.getElementById('rlc-out').innerHTML = 
+                `Z = ${R.toFixed(2)} ${sign} j${Math.abs(X).toFixed(2)} Ω &nbsp;|&nbsp; |Z| = ${mag.toFixed(2)} Ω &nbsp;|&nbsp; Phase: ${phaseDeg.toFixed(2)}°`;
+
+            renderScope(f);
+        }
+
+        function renderScope(freq) {
+            const ctx = document.getElementById('scopeCanvas').getContext('2d');
+            const labels = [];
+            const data = [];
+            const samples = 100;
+            const period = 1 / freq;
+
+            for (let i = 0; i < samples; i++) {
+                const t = (i / samples) * period * 2;
+                labels.push((t * 1000).toFixed(2));
+                data.push(Math.sin(2 * Math.PI * freq * t));
+            }
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'V(t) [Volt]',
+                        data: data,
+                        borderColor: '#38bdf8',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: true, title: { display: true, text: 'Idő (ms)', color: '#64748b' }, grid: { color: '#1e293b' } },
+                        y: { display: true, grid: { color: '#1e293b' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        window.onload = () => { calcRLC(); };
+    </script>
+</body>
+</html>
