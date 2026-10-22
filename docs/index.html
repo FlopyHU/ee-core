@@ -11,15 +11,19 @@
     <style>
         body { background-color: #0b0f19; color: #f8fafc; font-family: system-ui, sans-serif; }
         .card { background-color: #151c2c; border: 1px solid #232f48; }
-        .input-field { background-color: #0b0f19; border: 1px solid #334155; color: #f8fafc; }
-        .input-field:focus { border-color: #38bdf8; outline: none; }
+        .input-field { background-color: #0b0f19; border: 1px solid #334155; color: #f8fafc; transition: all 0.2s; }
+        .input-field:focus { border-color: #38bdf8; outline: none; box-shadow: 0 0 0 1px #38bdf8; }
+        .nav-btn { transition: all 0.2s; }
+        .nav-btn:hover { background-color: #1e293b; }
         .nav-btn.active { background-color: #0284c7; color: white; border-color: #38bdf8; }
-        .tab-content { display: none; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen pb-12 flex flex-col justify-between">
 
+    <!-- HEADER & NAVIGATION -->
     <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-4 py-4 sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-col xl:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
@@ -28,171 +32,262 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-xl tracking-wide text-white flex items-center gap-2">
-                        EE-Core Engine <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">v3.0 MAX</span>
+                        EE-Core Engine <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 tracking-wider">v3.1 PRO</span>
                     </h1>
                     <p class="text-xs text-slate-400">NJE Engineering Toolbox • <span class="text-sky-400 font-mono font-semibold">Flopy</span></p>
                 </div>
             </div>
 
             <nav class="flex flex-wrap justify-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
-                <button onclick="switchTab('tab-elec')" id="btn-tab-elec" class="nav-btn active px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-bolt text-yellow-400"></i> Villamosságtan</button>
-                <button onclick="switchTab('tab-matrix')" id="btn-tab-matrix" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-table-cells text-indigo-400"></i> Mátrixok</button>
-                <button onclick="switchTab('tab-signals')" id="btn-tab-signals" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-wave-square text-emerald-400"></i> Jelek & Rendszerek</button>
-                <button onclick="switchTab('tab-filter')" id="btn-tab-filter" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-filter text-rose-400"></i> Szűrők</button>
-                <button onclick="switchTab('tab-digital')" id="btn-tab-digital" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-microcode text-teal-400"></i> Digitális</button>
-                <button onclick="switchTab('tab-acoustics')" id="btn-tab-acoustics" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-volume-high text-orange-500"></i> Akusztika</button>
-                <button onclick="switchTab('tab-physics')" id="btn-tab-physics" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-atom text-purple-400"></i> Fizika</button>
+                <button onclick="switchTab('tab-elec')" id="btn-tab-elec" class="nav-btn active px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-bolt text-yellow-400 mr-1.5"></i>Villamosságtan</button>
+                <button onclick="switchTab('tab-matrix')" id="btn-tab-matrix" class="nav-btn px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-table-cells text-indigo-400 mr-1.5"></i>Mátrixok</button>
+                <button onclick="switchTab('tab-signals')" id="btn-tab-signals" class="nav-btn px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-wave-square text-emerald-400 mr-1.5"></i>Jelek & Rendszerek</button>
+                <button onclick="switchTab('tab-filter')" id="btn-tab-filter" class="nav-btn px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-filter text-rose-400 mr-1.5"></i>Szűrők</button>
+                <button onclick="switchTab('tab-digital')" id="btn-tab-digital" class="nav-btn px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-microcode text-teal-400 mr-1.5"></i>Digitális</button>
+                <button onclick="switchTab('tab-acoustics')" id="btn-tab-acoustics" class="nav-btn px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-volume-high text-orange-500 mr-1.5"></i>Akusztika</button>
+                <button onclick="switchTab('tab-physics')" id="btn-tab-physics" class="nav-btn px-3 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-atom text-purple-400 mr-1.5"></i>Fizika</button>
             </nav>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 mt-8 w-full">
+        
         <!-- TAB 1: VILLAMOSSÁGTAN -->
         <div id="tab-elec" class="tab-content active space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card rounded-2xl p-6">
-                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i>RLC Kompleks Impedancia</h2>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <input type="number" id="rlc-r" value="100" placeholder="R (Ω)" class="input-field rounded-lg p-2 text-sm">
-                        <input type="number" id="rlc-l" value="0.05" placeholder="L (H)" class="input-field rounded-lg p-2 text-sm">
-                        <input type="number" id="rlc-c" value="0.000002" placeholder="C (F)" class="input-field rounded-lg p-2 text-sm">
-                        <input type="number" id="rlc-f" value="1000" placeholder="f (Hz)" class="input-field rounded-lg p-2 text-sm">
+                <!-- RLC Card -->
+                <div class="card rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i>RLC Kompleks Impedancia</h2>
+                    <p class="text-xs text-slate-400 mb-5 leading-relaxed">
+                        Kiszámítja egy soros RLC hálózat eredő komplex impedanciáját (Z), az abszolút értéket és a fázisszöget adott frekvencián. Ideális váltakozóáramú körök analíziséhez.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Ellenállás (R - Ω)</label>
+                            <input type="number" id="rlc-r" value="100" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Induktivitás (L - H)</label>
+                            <input type="number" id="rlc-l" value="0.05" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Kapacitás (C - F)</label>
+                            <input type="number" id="rlc-c" value="0.000002" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Frekvencia (f - Hz)</label>
+                            <input type="number" id="rlc-f" value="1000" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
                     </div>
-                    <button onclick="calcRLC()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2 rounded-lg">Számítás</button>
-                    <div id="rlc-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-cyan-400">--</div>
+                    <button onclick="calcRLC()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-sky-900/50">Számítás Futtatása</button>
+                    <div id="rlc-out" class="mt-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-cyan-400">--</div>
                 </div>
 
-                <div class="card rounded-2xl p-6">
-                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Váltakozóáramú Teljesítmény</h2>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
+                <!-- Power Card -->
+                <div class="card rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Váltakozóáramú Teljesítmény</h2>
+                    <p class="text-xs text-slate-400 mb-5 leading-relaxed">
+                        Teljesítményháromszög számítása. Megadja a látszólagos (S), hatásos (P) és meddő (Q) teljesítményt a hálózati feszültség, áramfelvétel és a cos(φ) fázistényező alapján.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                         <div>
-                            <label class="text-xs text-slate-400">Feszültség (V rms)</label>
-                            <input type="number" id="pow-u" value="230" class="w-full input-field rounded-lg p-2 text-sm">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Feszültség (U_rms - V)</label>
+                            <input type="number" id="pow-u" value="230" class="w-full input-field rounded-lg p-2.5 text-sm">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Áram (A rms)</label>
-                            <input type="number" id="pow-i" value="16" class="w-full input-field rounded-lg p-2 text-sm">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Áram (I_rms - A)</label>
+                            <input type="number" id="pow-i" value="16" class="w-full input-field rounded-lg p-2.5 text-sm">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400">Fázisszög (cos φ)</label>
-                            <input type="number" id="pow-cos" value="0.85" step="0.01" class="w-full input-field rounded-lg p-2 text-sm">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Fázistényező (cos φ)</label>
+                            <input type="number" id="pow-cos" value="0.85" step="0.01" class="w-full input-field rounded-lg p-2.5 text-sm">
                         </div>
                     </div>
-                    <button onclick="calcPower()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-lg">Számítás</button>
-                    <div id="pow-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-amber-400">--</div>
+                    <button onclick="calcPower()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-amber-900/50">Számítás Futtatása</button>
+                    <div id="pow-out" class="mt-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-amber-400">--</div>
                 </div>
             </div>
         </div>
 
         <!-- TAB 2: MÁTRIXOK -->
         <div id="tab-matrix" class="tab-content space-y-6">
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-table-cells text-indigo-400 mr-2"></i>Nodal Analysis (Ax = b) Solver</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                    <textarea id="matrix-a" class="w-full h-32 input-field font-mono text-xs rounded-xl p-3" placeholder="Mátrix A">10 -5\n-5 15</textarea>
-                    <textarea id="matrix-b" class="w-full h-32 input-field font-mono text-xs rounded-xl p-3" placeholder="Vektor b">12\n0</textarea>
+            <div class="card rounded-2xl p-6 shadow-xl max-w-4xl mx-auto">
+                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-table-cells text-indigo-400 mr-2"></i>Csomóponti Potenciálok (Ax = b)</h2>
+                <p class="text-xs text-slate-400 mb-5 leading-relaxed">
+                    Nodal Analysis hálózatmegoldó. A konduktanciamátrix (A) és a forrásvektor (b) alapján Gauss-eliminációval (partial pivoting) határozza meg a csomóponti feszültségeket.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Konduktancia Mátrix [A] (Szóközzel elválasztva)</label>
+                        <textarea id="matrix-a" class="w-full h-32 input-field font-mono text-sm rounded-xl p-3">10 -5
+-5 15</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Forrás Vektor [b] (Soronként)</label>
+                        <textarea id="matrix-b" class="w-full h-32 input-field font-mono text-sm rounded-xl p-3">12
+0</textarea>
+                    </div>
                 </div>
-                <button onclick="solveMatrix()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-6 rounded-lg">Megoldás</button>
-                <div id="matrix-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-400">--</div>
+                <button onclick="solveMatrix()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-indigo-900/50">Mátrix Egyenletrendszer Megoldása</button>
+                <div id="matrix-out" class="mt-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-emerald-400">--</div>
             </div>
         </div>
 
         <!-- TAB 3: JELEK & RENDSZEREK -->
         <div id="tab-signals" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 card rounded-2xl p-6">
-                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-wave-square text-emerald-400 mr-2"></i>Oszcilloszkóp</h2>
-                    <div class="flex gap-4 mb-4">
-                        <select id="sig-type" class="input-field rounded-lg p-2 text-sm w-1/3" onchange="renderScope()">
-                            <option value="sine">Szinusz</option><option value="square">Négyszög</option>
-                        </select>
-                        <input type="number" id="sig-amp" value="5" placeholder="Amp (V)" class="input-field rounded-lg p-2 text-sm w-1/3" onchange="renderScope()">
-                        <input type="number" id="sig-freq" value="50" placeholder="Freq (Hz)" class="input-field rounded-lg p-2 text-sm w-1/3" onchange="renderScope()">
+                <!-- Scope -->
+                <div class="lg:col-span-2 card rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-wave-square text-emerald-400 mr-2"></i>Oszcilloszkóp Szimulátor</h2>
+                    <p class="text-xs text-slate-400 mb-5">Időtartománybeli jelek (szinusz, négyszög) vizualizációja megadott amplitúdóval és frekvenciával.</p>
+                    <div class="flex flex-wrap md:flex-nowrap gap-4 mb-5">
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Jelalak</label>
+                            <select id="sig-type" class="w-full input-field rounded-lg p-2.5 text-sm" onchange="renderScope()">
+                                <option value="sine">Szinusz</option><option value="square">Négyszög</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Amplitúdó (V_peak)</label>
+                            <input type="number" id="sig-amp" value="5" class="w-full input-field rounded-lg p-2.5 text-sm" onchange="renderScope()">
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Frekvencia (Hz)</label>
+                            <input type="number" id="sig-freq" value="50" class="w-full input-field rounded-lg p-2.5 text-sm" onchange="renderScope()">
+                        </div>
                     </div>
                     <div class="h-64 bg-slate-950 rounded-xl p-3 border border-slate-800"><canvas id="scopeCanvas"></canvas></div>
                 </div>
-                <div class="card rounded-2xl p-6">
-                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-microchip text-emerald-400 mr-2"></i>NE555 Timer (Astable)</h2>
-                    <div class="space-y-3 mb-4">
-                        <input type="number" id="n5-r1" value="1000" placeholder="R1 (Ω)" class="w-full input-field rounded-lg p-2 text-sm">
-                        <input type="number" id="n5-r2" value="4700" placeholder="R2 (Ω)" class="w-full input-field rounded-lg p-2 text-sm">
-                        <input type="number" id="n5-c" value="10" placeholder="C (uF)" class="w-full input-field rounded-lg p-2 text-sm">
+
+                <!-- 555 Timer -->
+                <div class="card rounded-2xl p-6 shadow-xl">
+                    <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-microchip text-emerald-400 mr-2"></i>NE555 Astable IC</h2>
+                    <p class="text-xs text-slate-400 mb-5">555-ös időzítő astabil multivibrátor módjának kimeneti frekvencia és kitöltési tényező (Duty Cycle) méretezése.</p>
+                    <div class="space-y-4 mb-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">R1 Ellenállás (Ω)</label>
+                            <input type="number" id="n5-r1" value="1000" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">R2 Ellenállás (Ω)</label>
+                            <input type="number" id="n5-r2" value="4700" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">C Kapacitás (uF)</label>
+                            <input type="number" id="n5-c" value="10" class="w-full input-field rounded-lg p-2.5 text-sm">
+                        </div>
                     </div>
-                    <button onclick="calc555()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg font-semibold">Számítás</button>
-                    <div id="n5-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-400">--</div>
+                    <button onclick="calc555()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-semibold transition shadow-lg shadow-emerald-900/50">Számítás Futtatása</button>
+                    <div id="n5-out" class="mt-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-emerald-400">--</div>
                 </div>
             </div>
         </div>
 
         <!-- TAB 4: SZŰRŐK -->
         <div id="tab-filter" class="tab-content space-y-6">
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-filter text-rose-400 mr-2"></i>RC Szűrő & Bode Diagram</h2>
-                <div class="flex gap-4 mb-4">
-                    <input type="number" id="flt-r" value="1000" placeholder="R (Ω)" class="input-field rounded-lg p-2 text-sm w-1/2" onchange="calcFilter()">
-                    <input type="number" id="flt-c" value="0.1" placeholder="C (uF)" class="input-field rounded-lg p-2 text-sm w-1/2" onchange="calcFilter()">
+            <div class="card rounded-2xl p-6 shadow-xl max-w-4xl mx-auto">
+                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-filter text-rose-400 mr-2"></i>RC Szűrő Tervező & Bode Plot</h2>
+                <p class="text-xs text-slate-400 mb-5 leading-relaxed">
+                    Elsőrendű passzív aluláteresztő (Low-Pass) szűrő méretezése. Kiszámítja a -3dB-es törési frekvenciát (fc), és felrajzolja a frekvenciafüggő amplitúdó-menetet (Bode-diagram).
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Soros Ellenállás (R - Ω)</label>
+                        <input type="number" id="flt-r" value="1000" class="w-full input-field rounded-lg p-2.5 text-sm" onchange="calcFilter()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Párhuzamos Kapacitás (C - uF)</label>
+                        <input type="number" id="flt-c" value="0.1" class="w-full input-field rounded-lg p-2.5 text-sm" onchange="calcFilter()">
+                    </div>
                 </div>
-                <div id="flt-out" class="mb-4 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-rose-400">--</div>
-                <div class="h-64 bg-slate-950 rounded-xl p-3 border border-slate-800"><canvas id="bodeCanvas"></canvas></div>
+                <div id="flt-out" class="mb-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-rose-400 font-bold">--</div>
+                <div class="h-72 bg-slate-950 rounded-xl p-3 border border-slate-800"><canvas id="bodeCanvas"></canvas></div>
             </div>
         </div>
 
         <!-- TAB 5: DIGITÁLIS -->
         <div id="tab-digital" class="tab-content space-y-6">
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-microcode text-teal-400 mr-2"></i>Hex / Bin / Dec Konverter (EEPROM & ECU)</h2>
-                <div class="space-y-4">
-                    <div><label class="text-xs text-slate-400">Decimális</label><input type="text" id="conv-dec" class="w-full input-field rounded-lg p-3 text-lg font-mono" oninput="convertBase('dec')"></div>
-                    <div><label class="text-xs text-slate-400">Hexadecimális</label><input type="text" id="conv-hex" class="w-full input-field rounded-lg p-3 text-lg font-mono text-teal-400" oninput="convertBase('hex')"></div>
-                    <div><label class="text-xs text-slate-400">Bináris</label><input type="text" id="conv-bin" class="w-full input-field rounded-lg p-3 text-lg font-mono text-sky-400" oninput="convertBase('bin')"></div>
+            <div class="card rounded-2xl p-6 shadow-xl max-w-3xl mx-auto">
+                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-microcode text-teal-400 mr-2"></i>Mérnöki Számrendszer Konverter</h2>
+                <p class="text-xs text-slate-400 mb-6 leading-relaxed">
+                    Élő konverzió hexadecimális, bináris és decimális formátumok között. Hasznos memória címek, maszkok, vagy ECU/EEPROM hex dump értékek (pl. EDC16 binárisok) dekódolásához.
+                </p>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Decimális (Base 10)</label>
+                        <input type="text" id="conv-dec" class="w-full input-field rounded-lg p-3.5 text-lg font-mono tracking-wider" placeholder="Írj be egy számot..." oninput="convertBase('dec')">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Hexadecimális (Base 16)</label>
+                        <input type="text" id="conv-hex" class="w-full input-field rounded-lg p-3.5 text-lg font-mono text-teal-400 uppercase tracking-wider" placeholder="pl. 1A4F" oninput="convertBase('hex')">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Bináris (Base 2)</label>
+                        <input type="text" id="conv-bin" class="w-full input-field rounded-lg p-3.5 text-lg font-mono text-sky-400 tracking-widest" placeholder="pl. 1101010" oninput="convertBase('bin')">
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- TAB 6: AKUSZTIKA -->
         <div id="tab-acoustics" class="tab-content space-y-6">
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-volume-high text-orange-500 mr-2"></i>Bass-Reflex L-Port Méretező</h2>
-                <p class="text-xs text-slate-400 mb-4">Helmholtz-rezonátor számítása mélynyomó láda hangolásához (Port Hossz).</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="card rounded-2xl p-6 shadow-xl max-w-4xl mx-auto">
+                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-volume-high text-orange-500 mr-2"></i>Helmholtz / Bass-Reflex L-Port Méretező</h2>
+                <p class="text-xs text-slate-400 mb-6 leading-relaxed">
+                    WinISD alternatíva. Kiszámítja a szükséges reflexcső / L-port fizikai hosszát egy adott belső doboztérfogat (Vb), port felület (Ap) és megcélzott hangolási frekvencia (Fb) eléréséhez.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
                     <div>
-                        <label class="text-xs text-slate-400">Nettó Térfogat (Vb - Liter)</label>
-                        <input type="number" id="box-v" value="74.82" class="w-full input-field rounded-lg p-2 text-sm">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Doboz Térfogat (Vb - Liter)</label>
+                        <input type="number" id="box-v" value="74.82" class="w-full input-field rounded-lg p-2.5 text-sm">
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400">Hangolási Frekvencia (Fb - Hz)</label>
-                        <input type="number" id="box-f" value="22" class="w-full input-field rounded-lg p-2 text-sm">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Hangolás (Fb - Hz)</label>
+                        <input type="number" id="box-f" value="22" class="w-full input-field rounded-lg p-2.5 text-sm">
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400">Port Felület (Ap - cm²)</label>
-                        <input type="number" id="box-a" value="150" class="w-full input-field rounded-lg p-2 text-sm">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Port Keresztmetszet (Ap - cm²)</label>
+                        <input type="number" id="box-a" value="150" class="w-full input-field rounded-lg p-2.5 text-sm">
                     </div>
                 </div>
-                <button onclick="calcPort()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2 rounded-lg">Port Hossz Számítása</button>
-                <div id="box-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-orange-400">--</div>
+                <button onclick="calcPort()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-orange-900/50">Port Hossz Számítása</button>
+                <div id="box-out" class="mt-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-orange-400">--</div>
             </div>
         </div>
 
         <!-- TAB 7: FIZIKA -->
         <div id="tab-physics" class="tab-content space-y-6">
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-car-side text-purple-400 mr-2"></i>Kinematika</h2>
-                <div class="grid grid-cols-3 gap-3 mb-4">
-                    <input type="number" id="phy-v0" value="0" placeholder="v0 (m/s)" class="input-field rounded-lg p-2 text-sm">
-                    <input type="number" id="phy-a" value="9.81" placeholder="a (m/s²)" class="input-field rounded-lg p-2 text-sm">
-                    <input type="number" id="phy-t" value="3" placeholder="t (s)" class="input-field rounded-lg p-2 text-sm">
+            <div class="card rounded-2xl p-6 shadow-xl max-w-4xl mx-auto">
+                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-car-side text-purple-400 mr-2"></i>Kinematika & Mozgásegyenletek</h2>
+                <p class="text-xs text-slate-400 mb-6 leading-relaxed">
+                    Egyenletesen változó egyenesvonalú mozgás analizálása. Kiszámítja a megtett utat (s) és a végsebességet (v) a kezdeti sebesség, gyorsulás és az eltelt idő alapján.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Kezdeti Sebesség (v0 - m/s)</label>
+                        <input type="number" id="phy-v0" value="0" class="w-full input-field rounded-lg p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Gyorsulás (a - m/s²)</label>
+                        <input type="number" id="phy-a" value="9.81" class="w-full input-field rounded-lg p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Eltelt Idő (t - másodperc)</label>
+                        <input type="number" id="phy-t" value="3" class="w-full input-field rounded-lg p-2.5 text-sm">
+                    </div>
                 </div>
-                <button onclick="calcPhysics()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-lg">Számítás</button>
-                <div id="phy-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-purple-300">--</div>
+                <button onclick="calcPhysics()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-lg transition shadow-lg shadow-purple-900/50">Út és Végsebesség Számítása</button>
+                <div id="phy-out" class="mt-5 p-4 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono text-purple-300">--</div>
             </div>
         </div>
 
     </main>
 
     <footer class="border-t border-slate-800 mt-12 py-6 text-center text-xs text-slate-500">
-        EE-Core Engineering Toolbox v3.0 • Created by <span class="text-slate-300 font-semibold">Flopy</span>
+        EE-Core Engineering Toolbox v3.1 PRO • Created by <span class="text-slate-300 font-semibold">Flopy</span>
     </footer>
 
+    <!-- Logic Script -->
     <script>
         let scopeChart = null;
         let bodeChart = null;
@@ -207,34 +302,35 @@
         }
 
         function calcRLC() {
-            const R = parseFloat(document.getElementById('rlc-r').value);
-            const L = parseFloat(document.getElementById('rlc-l').value);
-            const C = parseFloat(document.getElementById('rlc-c').value);
-            const f = parseFloat(document.getElementById('rlc-f').value);
+            const R = parseFloat(document.getElementById('rlc-r').value) || 0;
+            const L = parseFloat(document.getElementById('rlc-l').value) || 0;
+            const C = parseFloat(document.getElementById('rlc-c').value) || 0;
+            const f = parseFloat(document.getElementById('rlc-f').value) || 0;
             const omega = 2 * Math.PI * f;
             const X = (omega * L) - (C > 0 ? 1/(omega*C) : 0);
             const mag = Math.sqrt(R*R + X*X);
             const phase = Math.atan2(X, R) * (180/Math.PI);
-            document.getElementById('rlc-out').innerHTML = `Z = ${R.toFixed(2)} ${X>=0?'+':'-'} j${Math.abs(X).toFixed(2)} Ω | |Z| = ${mag.toFixed(2)} Ω | Fázis: ${phase.toFixed(2)}°`;
+            document.getElementById('rlc-out').innerHTML = `<strong>Z</strong> = ${R.toFixed(2)} ${X>=0?'+':'-'} j${Math.abs(X).toFixed(2)} Ω <br> <strong>|Z|</strong> = ${mag.toFixed(2)} Ω <br> <strong>Fázis (φ):</strong> ${phase.toFixed(2)}°`;
         }
 
         function calcPower() {
-            const U = parseFloat(document.getElementById('pow-u').value);
-            const I = parseFloat(document.getElementById('pow-i').value);
-            const cosphi = parseFloat(document.getElementById('pow-cos').value);
+            const U = parseFloat(document.getElementById('pow-u').value) || 0;
+            const I = parseFloat(document.getElementById('pow-i').value) || 0;
+            const cosphi = parseFloat(document.getElementById('pow-cos').value) || 0;
             const S = U * I;
             const P = S * cosphi;
-            const Q = Math.sqrt(S*S - P*P);
-            document.getElementById('pow-out').innerHTML = `Látszólagos (S): ${S.toFixed(2)} VA | Hatásos (P): ${P.toFixed(2)} W | Meddő (Q): ${Q.toFixed(2)} VAr`;
+            const Q = Math.sqrt(Math.max(0, S*S - P*P));
+            document.getElementById('pow-out').innerHTML = `Látszólagos (S): <strong>${S.toFixed(2)} VA</strong> <br> Hatásos (P): <strong>${P.toFixed(2)} W</strong> <br> Meddő (Q): <strong>${Q.toFixed(2)} VAr</strong>`;
         }
 
         function calc555() {
-            const r1 = parseFloat(document.getElementById('n5-r1').value);
-            const r2 = parseFloat(document.getElementById('n5-r2').value);
-            const c = parseFloat(document.getElementById('n5-c').value) * 1e-6;
+            const r1 = parseFloat(document.getElementById('n5-r1').value) || 0;
+            const r2 = parseFloat(document.getElementById('n5-r2').value) || 0;
+            const c = (parseFloat(document.getElementById('n5-c').value) || 0) * 1e-6;
+            if(c === 0 || (r1 + 2*r2) === 0) return;
             const f = 1.44 / ((r1 + 2*r2) * c);
             const duty = ((r1 + r2) / (r1 + 2*r2)) * 100;
-            document.getElementById('n5-out').innerHTML = `Frekvencia: ${f.toFixed(2)} Hz | Kitöltési tényező (Duty): ${duty.toFixed(1)} %`;
+            document.getElementById('n5-out').innerHTML = `Oszcillációs Frekvencia: <strong>${f.toFixed(2)} Hz</strong> <br> Kitöltési tényező (Duty Cycle): <strong>${duty.toFixed(1)} %</strong>`;
         }
 
         function solveMatrix() {
@@ -244,6 +340,7 @@
                 let n = A.length;
                 for (let i = 0; i < n; i++) {
                     for (let k = i+1; k < n; k++) {
+                        if(A[i][i] === 0) throw new Error("Nullával osztás!");
                         let c = -A[k][i]/A[i][i];
                         for (let j = i; j < n; j++) A[k][j] += c*A[i][j];
                         b[k] += c*b[i];
@@ -254,17 +351,19 @@
                     x[i] = b[i]/A[i][i];
                     for (let k = i-1; k >= 0; k--) b[k] -= A[k][i]*x[i];
                 }
-                document.getElementById('matrix-out').innerText = x.map((v,i) => `x${i+1} = ${v.toFixed(3)}`).join(' | ');
-            } catch (e) { document.getElementById('matrix-out').innerText = "Hiba!"; }
+                document.getElementById('matrix-out').innerText = x.map((v,i) => `V${i+1} = ${v.toFixed(4)} V`).join('  |  ');
+            } catch (e) { 
+                document.getElementById('matrix-out').innerText = "Hiba: Szinguláris vagy formátum hibás mátrix!"; 
+            }
         }
 
         function renderScope() {
             const ctx = document.getElementById('scopeCanvas').getContext('2d');
             const type = document.getElementById('sig-type').value;
-            const amp = parseFloat(document.getElementById('sig-amp').value);
-            const freq = parseFloat(document.getElementById('sig-freq').value);
+            const amp = parseFloat(document.getElementById('sig-amp').value) || 1;
+            const freq = parseFloat(document.getElementById('sig-freq').value) || 50;
             const data = [], labels = [];
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i <= 100; i++) {
                 let t = (i/100) * (2/freq);
                 labels.push((t*1000).toFixed(1));
                 let v = 0;
@@ -275,16 +374,23 @@
             if (scopeChart) scopeChart.destroy();
             scopeChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels, datasets: [{ data, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: { labels, datasets: [{ data, borderColor: '#10b981', borderWidth: 2.5, pointRadius: 0, tension: type==='sine'?0.4:0 }] },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { title: { display: true, text: 'Idő (ms)', color: '#64748b' }, grid: { color: '#1e293b' } },
+                        y: { title: { display: true, text: 'Feszültség (V)', color: '#64748b' }, grid: { color: '#1e293b' } }
+                    }
+                }
             });
         }
 
         function calcFilter() {
-            const R = parseFloat(document.getElementById('flt-r').value);
-            const C = parseFloat(document.getElementById('flt-c').value) * 1e-6;
+            const R = parseFloat(document.getElementById('flt-r').value) || 1000;
+            const C = (parseFloat(document.getElementById('flt-c').value) || 0.1) * 1e-6;
             const fc = 1 / (2 * Math.PI * R * C);
-            document.getElementById('flt-out').innerText = `Törési Frekvencia (fc): ${fc.toFixed(2)} Hz`;
+            document.getElementById('flt-out').innerHTML = `Törési Frekvencia (fc): <strong>${fc.toFixed(2)} Hz</strong> <span class="text-slate-500 ml-2">(-3dB pont)</span>`;
             
             const ctx = document.getElementById('bodeCanvas').getContext('2d');
             const data = [], labels = [];
@@ -297,14 +403,26 @@
             if (bodeChart) bodeChart.destroy();
             bodeChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels, datasets: [{ data, borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'logarithmic' } }, plugins: { legend: { display: false } } }
+                data: { labels, datasets: [{ data, borderColor: '#f43f5e', borderWidth: 2.5, pointRadius: 0 }] },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { type: 'logarithmic', title: { display: true, text: 'Frekvencia (Hz)', color: '#64748b' }, grid: { color: '#1e293b' } },
+                        y: { title: { display: true, text: 'Amplitúdó (dB)', color: '#64748b' }, grid: { color: '#1e293b' } }
+                    }
+                }
             });
         }
 
         function convertBase(source) {
-            let val = document.getElementById('conv-' + source).value;
-            if(!val) return;
+            let val = document.getElementById('conv-' + source).value.trim();
+            if(!val) {
+                document.getElementById('conv-dec').value = "";
+                document.getElementById('conv-hex').value = "";
+                document.getElementById('conv-bin').value = "";
+                return;
+            }
             try {
                 let num;
                 if(source === 'dec') num = BigInt(val);
@@ -313,28 +431,30 @@
                 if(source !== 'dec') document.getElementById('conv-dec').value = num.toString(10);
                 if(source !== 'hex') document.getElementById('conv-hex').value = num.toString(16).toUpperCase();
                 if(source !== 'bin') document.getElementById('conv-bin').value = num.toString(2);
-            } catch(e) {}
+            } catch(e) {} // Ignore invalid mid-typing chars
         }
 
         function calcPort() {
-            const Vb = parseFloat(document.getElementById('box-v').value);
-            const Fb = parseFloat(document.getElementById('box-f').value);
-            const Ap = parseFloat(document.getElementById('box-a').value);
+            const Vb = parseFloat(document.getElementById('box-v').value) || 0;
+            const Fb = parseFloat(document.getElementById('box-f').value) || 0;
+            const Ap = parseFloat(document.getElementById('box-a').value) || 0;
+            if(Vb === 0 || Fb === 0) return;
             const c = 34300; // hangsebesség cm/s
             const Lv = ((Math.pow(c, 2) * Ap) / (Math.pow(2 * Math.PI * Fb, 2) * (Vb * 1000))) - (0.823 * Math.sqrt(Ap));
-            document.getElementById('box-out').innerText = `Szükséges Port Hossz (Lp): ${Lv.toFixed(2)} cm`;
+            document.getElementById('box-out').innerHTML = `Szükséges fizikai csőhossz (Lp): <strong>${Lv.toFixed(2)} cm</strong>`;
         }
 
         function calcPhysics() {
-            const v0 = parseFloat(document.getElementById('phy-v0').value);
-            const a = parseFloat(document.getElementById('phy-a').value);
-            const t = parseFloat(document.getElementById('phy-t').value);
+            const v0 = parseFloat(document.getElementById('phy-v0').value) || 0;
+            const a = parseFloat(document.getElementById('phy-a').value) || 0;
+            const t = parseFloat(document.getElementById('phy-t').value) || 0;
             const s = (v0 * t) + (0.5 * a * t * t);
             const v = v0 + (a * t);
-            document.getElementById('phy-out').innerText = `Megtett út: ${s.toFixed(2)} m | Végsebesség: ${v.toFixed(2)} m/s`;
+            document.getElementById('phy-out').innerHTML = `Megtett út (s): <strong>${s.toFixed(2)} méter</strong> <br> Végsebesség (v): <strong>${v.toFixed(2)} m/s</strong> <span class="text-slate-500 ml-2">(${(v*3.6).toFixed(1)} km/h)</span>`;
         }
 
-        window.onload = () => { calcRLC(); calcPower(); calc555(); calcPort(); };
+        // Initialize default tabs on load
+        window.onload = () => { calcRLC(); calcPower(); calc555(); calcPort(); calcPhysics(); };
     </script>
 </body>
 </html>
