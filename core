@@ -1,0 +1,127 @@
+// ============================================================================
+// EE-CORE: Electrical Engineering Math & Signal Engine (C++17 Header-Only)
+// Készítette: Flopy (NJE Villamosmérnök 1. évf.)
+// GitHub: https://github.com/FlopyHU/ee-core-toolbox
+// ============================================================================
+
+#ifndef EE_CORE_HPP
+#define EE_CORE_HPP
+
+#include <vector>
+#include <complex>
+#include <cmath>
+#include <string>
+#include <stdexcept>
+
+namespace ee {
+
+    using Complex = std::complex<double>;
+    constexpr double PI = 3.14159265358979323846;
+
+    // ------------------------------------------------------------------------
+    // 1. ÁRAMKÖRI & IMPEDANCIA MŰVELETEK (RLC, Phasor Math)
+    // ------------------------------------------------------------------------
+    class Circuit {
+    public:
+        // Soros RLC eredő impedancia: Z = R + j*(w*L - 1/(w*C))
+        static Complex rlcSeries(double R, double L, double C, double freqHz) {
+            double omega = 2.0 * PI * freqHz;
+            double X_L = omega * L;
+            double X_C = (C > 0.0) ? (1.0 / (omega * C)) : 0.0;
+            return Complex(R, X_L - X_C);
+        }
+
+        // Párhuzamos RLC eredő impedancia
+        static Complex rlcParallel(double R, double L, double C, double freqHz) {
+            Complex Z_R(R, 0.0);
+            double omega = 2.0 * PI * freqHz;
+            Complex Z_L(0.0, omega * L);
+            Complex Z_C(0.0, (C > 0.0) ? -1.0 / (omega * C) : 0.0);
+
+            Complex Y = (1.0 / Z_R) + (1.0 / Z_L) + (1.0 / Z_C);
+            return 1.0 / Y;
+        }
+
+        // Bode törési frekvencia (fc = 1 / (2*pi*R*C))
+        static double rcCutoffFrequency(double R, double C) {
+            if (R <= 0.0 || C <= 0.0) return 0.0;
+            return 1.0 / (2.0 * PI * R * C);
+        }
+    };
+
+    // ------------------------------------------------------------------------
+    // 2. MÁTRIX ENGINE & CSOMÓPONTI POTENCIÁLOK MÓDSZERE (Ax = b)
+    // ------------------------------------------------------------------------
+    class Matrix {
+    public:
+        size_t rows, cols;
+        std::vector<std::vector<double>> data;
+
+        Matrix(size_t r, size_t c) : rows(r), cols(c), data(r, std::vector<double>(c, 0.0)) {}
+
+        // Lineáris egyenletrendszer megoldása Gauss-eliminációval (Partial Pivoting)
+        static std::vector<double> solveLinearSystem(Matrix A, std::vector<double> b) {
+            size_t n = A.rows;
+            for (size_t i = 0; i < n; i++) {
+                size_t maxRow = i;
+                for (size_t k = i + 1; k < n; k++) {
+                    if (std::abs(A.data[k][i]) > std::abs(A.data[maxRow][i])) {
+                        maxRow = k;
+                    }
+                }
+                std::swap(A.data[i], A.data[maxRow]);
+                std::swap(b[i], b[maxRow]);
+
+                if (std::abs(A.data[i][i]) < 1e-12) {
+                    throw std::runtime_error("Szinguláris mátrix / Determinisztikus hiba!");
+                }
+
+                for (size_t k = i + 1; k < n; k++) {
+                    double c = -A.data[k][i] / A.data[i][i];
+                    for (size_t j = i; j < n; j++) {
+                        if (i == j) A.data[k][j] = 0;
+                        else A.data[k][j] += c * A.data[i][j];
+                    }
+                    b[k] += c * b[i];
+                }
+            }
+
+            std::vector<double> x(n);
+            for (int i = static_cast<int>(n) - 1; i >= 0; i--) {
+                x[i] = b[i] / A.data[i][i];
+                for (int k = i - 1; k >= 0; k--) {
+                    b[k] -= A.data[k][i] * x[i];
+                }
+            }
+            return x;
+        }
+    };
+
+    // ------------------------------------------------------------------------
+    // 3. JELFELDOLGOZÁS & OSZCILLOSZKÓP SIMULÁTOR (DSP)
+    // ------------------------------------------------------------------------
+    class SignalEngine {
+    public:
+        // Szinusz hullám generálása mintavételezési frekvenciával
+        static std::vector<double> generateSine(double amplitude, double freqHz, double phaseRad, size_t sampleCount, double sampleRateHz) {
+            std::vector<double> signal(sampleCount);
+            for (size_t i = 0; i < sampleCount; ++i) {
+                double t = static_cast<double>(i) / sampleRateHz;
+                signal[i] = amplitude * std::sin(2.0 * PI * freqHz * t + phaseRad);
+            }
+            return signal;
+        }
+
+        // RMS (Gyökös Átlagnégyzet) feszültség/áram számítása
+        static double calculateRMS(const std::vector<double>& signal) {
+            if (signal.empty()) return 0.0;
+            double sumSq = 0.0;
+            for (double v : signal) {
+                sumSq += v * v;
+            }
+            return std::sqrt(sumSq / signal.size());
+        }
+    };
+}
+
+#endif // EE_CORE_HPP
