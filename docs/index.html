@@ -3,150 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EE-Core Web Engine</title>
+    <title>EE-Core Ultimate Engine • Flopy</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M9 2v2H7c-1.1 0-2 .9-2 2v2H3v2h2v4H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h4v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-4h2V8h-2V6c0-1.1-.9-2-2-2h-2V2h-2v2h-4V2H9zm0 6h6v6H9V8z'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
-        .card { background-color: #1e293b; border: 1px solid #334155; }
-        .input-field { background-color: #0f172a; border: 1px solid #475569; color: #f8fafc; }
+        body { background-color: #0b0f19; color: #f8fafc; font-family: system-ui, sans-serif; }
+        .card { background-color: #151c2c; border: 1px solid #232f48; }
+        .input-field { background-color: #0b0f19; border: 1px solid #334155; color: #f8fafc; }
         .input-field:focus { border-color: #38bdf8; outline: none; }
+        .nav-btn.active { background-color: #0284c7; color: white; border-color: #38bdf8; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="min-h-screen pb-12">
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 py-4 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
+<body class="min-h-screen pb-12 flex flex-col justify-between">
+
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-4 py-4 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col xl:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white p-2 rounded-lg font-bold"><i class="fa-solid fa-microchip"></i></div>
+                <div class="bg-gradient-to-tr from-blue-600 to-cyan-500 text-white p-2.5 rounded-xl font-bold shadow-cyan-500/20 shadow-lg">
+                    <i class="fa-solid fa-microchip text-lg"></i>
+                </div>
                 <div>
-                    <h1 class="font-bold text-xl tracking-wide text-white">EE-Core Engine</h1>
-                    <p class="text-xs text-slate-400">Villamosmérnöki Eszköztár & Core C++ Engine • <span class="text-blue-400 font-mono">Flopy</span></p>
+                    <h1 class="font-bold text-xl tracking-wide text-white flex items-center gap-2">
+                        EE-Core Engine <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">v3.0 MAX</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">NJE Engineering Toolbox • <span class="text-sky-400 font-mono font-semibold">Flopy</span></p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <button id="langToggle" onclick="toggleLanguage()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-xs font-semibold border border-slate-700 transition">
-                    🌐 <span id="langText">EN</span>
-                </button>
-                <a href="https://github.com/FlopyHU/ee-core" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-xs font-semibold border border-slate-700 transition flex items-center gap-2">
-                    <i class="fa-brands fa-github"></i> GitHub
-                </a>
-            </div>
+
+            <nav class="flex flex-wrap justify-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs">
+                <button onclick="switchTab('tab-elec')" id="btn-tab-elec" class="nav-btn active px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-bolt text-yellow-400"></i> Villamosságtan</button>
+                <button onclick="switchTab('tab-matrix')" id="btn-tab-matrix" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-table-cells text-indigo-400"></i> Mátrixok</button>
+                <button onclick="switchTab('tab-signals')" id="btn-tab-signals" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-wave-square text-emerald-400"></i> Jelek & Rendszerek</button>
+                <button onclick="switchTab('tab-filter')" id="btn-tab-filter" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-filter text-rose-400"></i> Szűrők</button>
+                <button onclick="switchTab('tab-digital')" id="btn-tab-digital" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-microcode text-teal-400"></i> Digitális</button>
+                <button onclick="switchTab('tab-acoustics')" id="btn-tab-acoustics" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-volume-high text-orange-500"></i> Akusztika</button>
+                <button onclick="switchTab('tab-physics')" id="btn-tab-physics" class="nav-btn px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-atom text-purple-400"></i> Fizika</button>
+            </nav>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-6 mt-8 space-y-8">
-        <!-- RLC Calculator -->
-        <section class="card rounded-xl p-6 shadow-xl">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-bolt text-yellow-400"></i>
-                <span id="txt-rlc-title">RLC Soros / Párhuzamos Kompleks Impedancia</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Ellenállás (R - Ω)</label>
-                    <input type="number" id="rlc-r" value="100" class="w-full input-field rounded p-2 text-sm">
+    <main class="max-w-7xl mx-auto px-4 mt-8 w-full">
+        <!-- TAB 1: VILLAMOSSÁGTAN -->
+        <div id="tab-elec" class="tab-content active space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-bolt text-yellow-400 mr-2"></i>RLC Kompleks Impedancia</h2>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <input type="number" id="rlc-r" value="100" placeholder="R (Ω)" class="input-field rounded-lg p-2 text-sm">
+                        <input type="number" id="rlc-l" value="0.05" placeholder="L (H)" class="input-field rounded-lg p-2 text-sm">
+                        <input type="number" id="rlc-c" value="0.000002" placeholder="C (F)" class="input-field rounded-lg p-2 text-sm">
+                        <input type="number" id="rlc-f" value="1000" placeholder="f (Hz)" class="input-field rounded-lg p-2 text-sm">
+                    </div>
+                    <button onclick="calcRLC()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2 rounded-lg">Számítás</button>
+                    <div id="rlc-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-cyan-400">--</div>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Induktivitás (L - H)</label>
-                    <input type="number" id="rlc-l" value="0.01" step="0.001" class="w-full input-field rounded p-2 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Kapacitás (C - F)</label>
-                    <input type="number" id="rlc-c" value="0.000001" step="0.000001" class="w-full input-field rounded p-2 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Frekvencia (f - Hz)</label>
-                    <input type="number" id="rlc-f" value="1000" class="w-full input-field rounded p-2 text-sm">
-                </div>
-            </div>
-            <button onclick="calcRLC()" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded text-sm transition">
-                <i class="fa-solid fa-calculator mr-1"></i> Számítás
-            </button>
 
-            <div id="rlc-out" class="mt-4 p-4 rounded bg-slate-900 border border-slate-800 text-sm font-mono text-cyan-400">
-                Z = 100.00 + j62.83 Ω | |Z| = 118.10 Ω | Phase: 32.14°
+                <div class="card rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Váltakozóáramú Teljesítmény</h2>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="text-xs text-slate-400">Feszültség (V rms)</label>
+                            <input type="number" id="pow-u" value="230" class="w-full input-field rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Áram (A rms)</label>
+                            <input type="number" id="pow-i" value="16" class="w-full input-field rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Fázisszög (cos φ)</label>
+                            <input type="number" id="pow-cos" value="0.85" step="0.01" class="w-full input-field rounded-lg p-2 text-sm">
+                        </div>
+                    </div>
+                    <button onclick="calcPower()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-lg">Számítás</button>
+                    <div id="pow-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-amber-400">--</div>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Oscilloscope Simulator -->
-        <section class="card rounded-xl p-6 shadow-xl">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-wave-square text-emerald-400"></i>
-                <span id="txt-osc-title">Jelgenerátor & Oszcilloszkóp Szimulátor</span>
-            </h2>
-            <div class="h-64 bg-slate-900 rounded p-2 border border-slate-800">
-                <canvas id="scopeCanvas"></canvas>
+        <!-- TAB 2: MÁTRIXOK -->
+        <div id="tab-matrix" class="tab-content space-y-6">
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-base font-bold text-white mb-2"><i class="fa-solid fa-table-cells text-indigo-400 mr-2"></i>Nodal Analysis (Ax = b) Solver</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <textarea id="matrix-a" class="w-full h-32 input-field font-mono text-xs rounded-xl p-3" placeholder="Mátrix A">10 -5\n-5 15</textarea>
+                    <textarea id="matrix-b" class="w-full h-32 input-field font-mono text-xs rounded-xl p-3" placeholder="Vektor b">12\n0</textarea>
+                </div>
+                <button onclick="solveMatrix()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-6 rounded-lg">Megoldás</button>
+                <div id="matrix-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-400">--</div>
             </div>
-        </section>
+        </div>
+
+        <!-- TAB 3: JELEK & RENDSZEREK -->
+        <div id="tab-signals" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 card rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-wave-square text-emerald-400 mr-2"></i>Oszcilloszkóp</h2>
+                    <div class="flex gap-4 mb-4">
+                        <select id="sig-type" class="input-field rounded-lg p-2 text-sm w-1/3" onchange="renderScope()">
+                            <option value="sine">Szinusz</option><option value="square">Négyszög</option>
+                        </select>
+                        <input type="number" id="sig-amp" value="5" placeholder="Amp (V)" class="input-field rounded-lg p-2 text-sm w-1/3" onchange="renderScope()">
+                        <input type="number" id="sig-freq" value="50" placeholder="Freq (Hz)" class="input-field rounded-lg p-2 text-sm w-1/3" onchange="renderScope()">
+                    </div>
+                    <div class="h-64 bg-slate-950 rounded-xl p-3 border border-slate-800"><canvas id="scopeCanvas"></canvas></div>
+                </div>
+                <div class="card rounded-2xl p-6">
+                    <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-microchip text-emerald-400 mr-2"></i>NE555 Timer (Astable)</h2>
+                    <div class="space-y-3 mb-4">
+                        <input type="number" id="n5-r1" value="1000" placeholder="R1 (Ω)" class="w-full input-field rounded-lg p-2 text-sm">
+                        <input type="number" id="n5-r2" value="4700" placeholder="R2 (Ω)" class="w-full input-field rounded-lg p-2 text-sm">
+                        <input type="number" id="n5-c" value="10" placeholder="C (uF)" class="w-full input-field rounded-lg p-2 text-sm">
+                    </div>
+                    <button onclick="calc555()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg font-semibold">Számítás</button>
+                    <div id="n5-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-400">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SZŰRŐK -->
+        <div id="tab-filter" class="tab-content space-y-6">
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-filter text-rose-400 mr-2"></i>RC Szűrő & Bode Diagram</h2>
+                <div class="flex gap-4 mb-4">
+                    <input type="number" id="flt-r" value="1000" placeholder="R (Ω)" class="input-field rounded-lg p-2 text-sm w-1/2" onchange="calcFilter()">
+                    <input type="number" id="flt-c" value="0.1" placeholder="C (uF)" class="input-field rounded-lg p-2 text-sm w-1/2" onchange="calcFilter()">
+                </div>
+                <div id="flt-out" class="mb-4 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-rose-400">--</div>
+                <div class="h-64 bg-slate-950 rounded-xl p-3 border border-slate-800"><canvas id="bodeCanvas"></canvas></div>
+            </div>
+        </div>
+
+        <!-- TAB 5: DIGITÁLIS -->
+        <div id="tab-digital" class="tab-content space-y-6">
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-microcode text-teal-400 mr-2"></i>Hex / Bin / Dec Konverter (EEPROM & ECU)</h2>
+                <div class="space-y-4">
+                    <div><label class="text-xs text-slate-400">Decimális</label><input type="text" id="conv-dec" class="w-full input-field rounded-lg p-3 text-lg font-mono" oninput="convertBase('dec')"></div>
+                    <div><label class="text-xs text-slate-400">Hexadecimális</label><input type="text" id="conv-hex" class="w-full input-field rounded-lg p-3 text-lg font-mono text-teal-400" oninput="convertBase('hex')"></div>
+                    <div><label class="text-xs text-slate-400">Bináris</label><input type="text" id="conv-bin" class="w-full input-field rounded-lg p-3 text-lg font-mono text-sky-400" oninput="convertBase('bin')"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: AKUSZTIKA -->
+        <div id="tab-acoustics" class="tab-content space-y-6">
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-volume-high text-orange-500 mr-2"></i>Bass-Reflex L-Port Méretező</h2>
+                <p class="text-xs text-slate-400 mb-4">Helmholtz-rezonátor számítása mélynyomó láda hangolásához (Port Hossz).</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="text-xs text-slate-400">Nettó Térfogat (Vb - Liter)</label>
+                        <input type="number" id="box-v" value="74.82" class="w-full input-field rounded-lg p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400">Hangolási Frekvencia (Fb - Hz)</label>
+                        <input type="number" id="box-f" value="22" class="w-full input-field rounded-lg p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400">Port Felület (Ap - cm²)</label>
+                        <input type="number" id="box-a" value="150" class="w-full input-field rounded-lg p-2 text-sm">
+                    </div>
+                </div>
+                <button onclick="calcPort()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2 rounded-lg">Port Hossz Számítása</button>
+                <div id="box-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-orange-400">--</div>
+            </div>
+        </div>
+
+        <!-- TAB 7: FIZIKA -->
+        <div id="tab-physics" class="tab-content space-y-6">
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-car-side text-purple-400 mr-2"></i>Kinematika</h2>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <input type="number" id="phy-v0" value="0" placeholder="v0 (m/s)" class="input-field rounded-lg p-2 text-sm">
+                    <input type="number" id="phy-a" value="9.81" placeholder="a (m/s²)" class="input-field rounded-lg p-2 text-sm">
+                    <input type="number" id="phy-t" value="3" placeholder="t (s)" class="input-field rounded-lg p-2 text-sm">
+                </div>
+                <button onclick="calcPhysics()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-lg">Számítás</button>
+                <div id="phy-out" class="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-purple-300">--</div>
+            </div>
+        </div>
+
     </main>
 
+    <footer class="border-t border-slate-800 mt-12 py-6 text-center text-xs text-slate-500">
+        EE-Core Engineering Toolbox v3.0 • Created by <span class="text-slate-300 font-semibold">Flopy</span>
+    </footer>
+
     <script>
-        let currentLang = 'hu';
-        let chartInstance = null;
+        let scopeChart = null;
+        let bodeChart = null;
 
-        function calcRLC() {
-            const R = parseFloat(document.getElementById('rlc-r').value) || 0;
-            const L = parseFloat(document.getElementById('rlc-l').value) || 0;
-            const C = parseFloat(document.getElementById('rlc-c').value) || 0;
-            const f = parseFloat(document.getElementById('rlc-f').value) || 0;
-
-            const omega = 2 * Math.PI * f;
-            const X_L = omega * L;
-            const X_C = C > 0 ? (1 / (omega * C)) : 0;
-            const X = X_L - X_C;
-
-            const mag = Math.sqrt(R*R + X*X);
-            const phaseDeg = Math.atan2(X, R) * (180 / Math.PI);
-            const sign = X >= 0 ? '+' : '-';
-
-            document.getElementById('rlc-out').innerHTML = 
-                `Z = ${R.toFixed(2)} ${sign} j${Math.abs(X).toFixed(2)} Ω &nbsp;|&nbsp; |Z| = ${mag.toFixed(2)} Ω &nbsp;|&nbsp; Phase: ${phaseDeg.toFixed(2)}°`;
-
-            renderScope(f);
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            if (tabId === 'tab-signals') renderScope();
+            if (tabId === 'tab-filter') calcFilter();
         }
 
-        function renderScope(freq) {
-            const ctx = document.getElementById('scopeCanvas').getContext('2d');
-            const labels = [];
-            const data = [];
-            const samples = 100;
-            const period = 1 / freq;
+        function calcRLC() {
+            const R = parseFloat(document.getElementById('rlc-r').value);
+            const L = parseFloat(document.getElementById('rlc-l').value);
+            const C = parseFloat(document.getElementById('rlc-c').value);
+            const f = parseFloat(document.getElementById('rlc-f').value);
+            const omega = 2 * Math.PI * f;
+            const X = (omega * L) - (C > 0 ? 1/(omega*C) : 0);
+            const mag = Math.sqrt(R*R + X*X);
+            const phase = Math.atan2(X, R) * (180/Math.PI);
+            document.getElementById('rlc-out').innerHTML = `Z = ${R.toFixed(2)} ${X>=0?'+':'-'} j${Math.abs(X).toFixed(2)} Ω | |Z| = ${mag.toFixed(2)} Ω | Fázis: ${phase.toFixed(2)}°`;
+        }
 
-            for (let i = 0; i < samples; i++) {
-                const t = (i / samples) * period * 2;
-                labels.push((t * 1000).toFixed(2));
-                data.push(Math.sin(2 * Math.PI * freq * t));
-            }
+        function calcPower() {
+            const U = parseFloat(document.getElementById('pow-u').value);
+            const I = parseFloat(document.getElementById('pow-i').value);
+            const cosphi = parseFloat(document.getElementById('pow-cos').value);
+            const S = U * I;
+            const P = S * cosphi;
+            const Q = Math.sqrt(S*S - P*P);
+            document.getElementById('pow-out').innerHTML = `Látszólagos (S): ${S.toFixed(2)} VA | Hatásos (P): ${P.toFixed(2)} W | Meddő (Q): ${Q.toFixed(2)} VAr`;
+        }
 
-            if (chartInstance) chartInstance.destroy();
+        function calc555() {
+            const r1 = parseFloat(document.getElementById('n5-r1').value);
+            const r2 = parseFloat(document.getElementById('n5-r2').value);
+            const c = parseFloat(document.getElementById('n5-c').value) * 1e-6;
+            const f = 1.44 / ((r1 + 2*r2) * c);
+            const duty = ((r1 + r2) / (r1 + 2*r2)) * 100;
+            document.getElementById('n5-out').innerHTML = `Frekvencia: ${f.toFixed(2)} Hz | Kitöltési tényező (Duty): ${duty.toFixed(1)} %`;
+        }
 
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'V(t) [Volt]',
-                        data: data,
-                        borderColor: '#38bdf8',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { display: true, title: { display: true, text: 'Idő (ms)', color: '#64748b' }, grid: { color: '#1e293b' } },
-                        y: { display: true, grid: { color: '#1e293b' } }
-                    },
-                    plugins: { legend: { display: false } }
+        function solveMatrix() {
+            try {
+                let A = document.getElementById('matrix-a').value.trim().split('\n').map(l => l.trim().split(/\s+/).map(Number));
+                let b = document.getElementById('matrix-b').value.trim().split('\n').map(Number);
+                let n = A.length;
+                for (let i = 0; i < n; i++) {
+                    for (let k = i+1; k < n; k++) {
+                        let c = -A[k][i]/A[i][i];
+                        for (let j = i; j < n; j++) A[k][j] += c*A[i][j];
+                        b[k] += c*b[i];
+                    }
                 }
+                let x = new Array(n);
+                for (let i = n-1; i >= 0; i--) {
+                    x[i] = b[i]/A[i][i];
+                    for (let k = i-1; k >= 0; k--) b[k] -= A[k][i]*x[i];
+                }
+                document.getElementById('matrix-out').innerText = x.map((v,i) => `x${i+1} = ${v.toFixed(3)}`).join(' | ');
+            } catch (e) { document.getElementById('matrix-out').innerText = "Hiba!"; }
+        }
+
+        function renderScope() {
+            const ctx = document.getElementById('scopeCanvas').getContext('2d');
+            const type = document.getElementById('sig-type').value;
+            const amp = parseFloat(document.getElementById('sig-amp').value);
+            const freq = parseFloat(document.getElementById('sig-freq').value);
+            const data = [], labels = [];
+            for (let i = 0; i < 100; i++) {
+                let t = (i/100) * (2/freq);
+                labels.push((t*1000).toFixed(1));
+                let v = 0;
+                if(type === 'sine') v = amp * Math.sin(2*Math.PI*freq*t);
+                if(type === 'square') v = Math.sin(2*Math.PI*freq*t) >= 0 ? amp : -amp;
+                data.push(v);
+            }
+            if (scopeChart) scopeChart.destroy();
+            scopeChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ data, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
-        window.onload = () => { calcRLC(); };
+        function calcFilter() {
+            const R = parseFloat(document.getElementById('flt-r').value);
+            const C = parseFloat(document.getElementById('flt-c').value) * 1e-6;
+            const fc = 1 / (2 * Math.PI * R * C);
+            document.getElementById('flt-out').innerText = `Törési Frekvencia (fc): ${fc.toFixed(2)} Hz`;
+            
+            const ctx = document.getElementById('bodeCanvas').getContext('2d');
+            const data = [], labels = [];
+            for (let i = -1; i <= 3; i+=0.1) {
+                let f = fc * Math.pow(10, i);
+                labels.push(f.toFixed(0));
+                let mag = 20 * Math.log10(1 / Math.sqrt(1 + Math.pow(f/fc, 2)));
+                data.push(mag);
+            }
+            if (bodeChart) bodeChart.destroy();
+            bodeChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ data, borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'logarithmic' } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function convertBase(source) {
+            let val = document.getElementById('conv-' + source).value;
+            if(!val) return;
+            try {
+                let num;
+                if(source === 'dec') num = BigInt(val);
+                if(source === 'hex') num = BigInt("0x" + val);
+                if(source === 'bin') num = BigInt("0b" + val);
+                if(source !== 'dec') document.getElementById('conv-dec').value = num.toString(10);
+                if(source !== 'hex') document.getElementById('conv-hex').value = num.toString(16).toUpperCase();
+                if(source !== 'bin') document.getElementById('conv-bin').value = num.toString(2);
+            } catch(e) {}
+        }
+
+        function calcPort() {
+            const Vb = parseFloat(document.getElementById('box-v').value);
+            const Fb = parseFloat(document.getElementById('box-f').value);
+            const Ap = parseFloat(document.getElementById('box-a').value);
+            const c = 34300; // hangsebesség cm/s
+            const Lv = ((Math.pow(c, 2) * Ap) / (Math.pow(2 * Math.PI * Fb, 2) * (Vb * 1000))) - (0.823 * Math.sqrt(Ap));
+            document.getElementById('box-out').innerText = `Szükséges Port Hossz (Lp): ${Lv.toFixed(2)} cm`;
+        }
+
+        function calcPhysics() {
+            const v0 = parseFloat(document.getElementById('phy-v0').value);
+            const a = parseFloat(document.getElementById('phy-a').value);
+            const t = parseFloat(document.getElementById('phy-t').value);
+            const s = (v0 * t) + (0.5 * a * t * t);
+            const v = v0 + (a * t);
+            document.getElementById('phy-out').innerText = `Megtett út: ${s.toFixed(2)} m | Végsebesség: ${v.toFixed(2)} m/s`;
+        }
+
+        window.onload = () => { calcRLC(); calcPower(); calc555(); calcPort(); };
     </script>
 </body>
 </html>
